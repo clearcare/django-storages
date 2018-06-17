@@ -376,6 +376,7 @@ class S3BotoStorage(Storage):
             zfile.close()
         zbuf.seek(0)
         content.file = zbuf
+        zbuf.size = zfile.size # django expects this to be more file-like
         content.seek(0)
         return content
 
