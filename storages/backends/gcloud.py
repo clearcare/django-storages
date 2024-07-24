@@ -1,7 +1,7 @@
 import gzip
 import io
 import mimetypes
-from datetime import timedelta
+from datetime import datetime, timedelta
 from tempfile import SpooledTemporaryFile
 
 from django.core.exceptions import ImproperlyConfigured
@@ -17,6 +17,9 @@ from storages.utils import clean_name
 from storages.utils import safe_join
 from storages.utils import setting
 from storages.utils import to_bytes
+
+import google.auth
+from google.auth.transport import requests
 
 try:
     from google.cloud.exceptions import NotFound
@@ -333,5 +336,15 @@ class GoogleCloudStorage(BaseStorage):
             for key, value in default_params.items():
                 if value and key not in params:
                     params[key] = value
+
+            expires = datetime.now() + timedelta(seconds=86400)
+            credentials, project = google.auth.default()
+            r = requests.Request()
+            credentials.refresh(r)
+            params.extend({
+              'service_account_email': credentials.service_account_email,
+              'access_token': credentials.token,
+              'expiration': expires
+            })
 
             return blob.generate_signed_url(**params)
