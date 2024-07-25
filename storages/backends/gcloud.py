@@ -341,7 +341,7 @@ class GoogleCloudStorage(BaseStorage):
             credentials, project = google.auth.default()
             r = requests.Request()
             credentials.refresh(r)
-            params.extend({
+            params.update({
               'service_account_email': credentials.service_account_email,
               'access_token': credentials.token,
               'expiration': expires
