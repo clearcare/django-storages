@@ -338,7 +338,11 @@ class GoogleCloudStorage(BaseStorage):
                     params[key] = value
 
             expires = datetime.now() + timedelta(seconds=86400)
-            credentials, project = google.auth.default()
+            if self.credentials:
+                credentials = self.credentials
+                project = self.project_id
+            else:
+                credentials, project = google.auth.default()
             r = requests.Request()
             credentials.refresh(r)
             params.update({
